@@ -55,7 +55,6 @@ public class Main {
                Letter = alphabet.get(indexLetter+2);
 
                 //text.set(i,l);
-
                System.out.println("new letter: "+Letter);
 
             }
