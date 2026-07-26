@@ -50,7 +50,6 @@ public class Main {
                 }
                 encryptedWord = String.valueOf(stringBuilder.append(Letter));
             }
-
             encryptedText.add(encryptedWord);
         }
         System.out.println(encryptedText);
