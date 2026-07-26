@@ -5,14 +5,13 @@ import java.util.Scanner;
 public class Main {
     public ArrayList<String> text = new ArrayList<>();
     ArrayList<Character> alphabet = new ArrayList<>();
-    ArrayList<String> encryptedText = new ArrayList<>();
+    int shiftEncryptionAmount =2;
 
     static void main(String[] args){
         Main main = new Main();
         main.populateArray();
         main.readFromFile();
-      //  main.encrypt();
-
+        main.encrypt();
     }
 
     void populateArray() {
@@ -24,7 +23,7 @@ public class Main {
     void readFromFile() {
         try(Scanner scFile = new Scanner(new FileInputStream("Text.txt"))){
             while (scFile.hasNext()) {
-                text.add(scFile.next());
+                text.add(scFile.next().toLowerCase());                                                                    //Uses .next instead of .nextLine because we want each individual word from the index
             }
         }
         catch(IOException e){
@@ -34,55 +33,50 @@ public class Main {
 
 
     void encrypt(){
-        for (int i =0; i<text.size();i++){
-            char Letter;
-            String wordFromText;
+        ArrayList<String> encryptedText = new ArrayList<>();
+        for (int i=0;i<text.size();i++){
+            //each increment of i add a finder for the array that allows for each different line to be distinguished
+            String WholeWord = text.get(i);
             int indexLetter;
             String encryptedWord= "";
             StringBuilder stringBuilder = new StringBuilder();
-            wordFromText = text.get(i);
-            String wholeWord="";
-
-           for (int l=0; l<wordFromText.length();l++) {
-               Letter = wordFromText.charAt(l);
-
-               if (!Character.isLetterOrDigit(Letter)){
-                   //Somehow separate each word into its own variable to encrypt the letters
-                   System.out.println("special character: "+Letter +" at index: "+l);
-                   if (Character.isWhitespace(Letter)){
-                       int j=l;
-                       char blankLetter;
-
-                       while (true){
-                           blankLetter = wordFromText.charAt(j-1);
-                           if (Character.isWhitespace(blankLetter)){
-                               wholeWord = wordFromText.substring(j,i+1);
-                               break;
-                           } else{
-                               j--;
-                           }
-                       }
-                   }
-               }
-               for (int y=0; y< wholeWord.length();y++){
-                   Letter = wholeWord.charAt(y);
-                   indexLetter = alphabet.indexOf(Letter);
-                   Letter = alphabet.get(indexOverZ(indexLetter));
-                   encryptedWord = String.valueOf(stringBuilder.append(Letter));
-               }
-
-           }
-            //System.out.println("encryptedWord: "+encryptedWord);
+            for (int k=0;k <WholeWord.length();k++){
+                char Letter = WholeWord.charAt(k);
+                if (!Character.isLetter(Letter)){
+                    System.out.println("Special character at index: "+i);
+                } else {
+                    indexLetter = alphabet.indexOf(Letter);
+                    Letter = alphabet.get(indexOverZ(indexLetter));
+                }
+                encryptedWord = String.valueOf(stringBuilder.append(Letter));
+            }
             encryptedText.add(encryptedWord);
         }
         System.out.println(encryptedText);
+        System.out.println(writeToFile(encryptedText));
     }
 
     int indexOverZ(int indexLetter){
-        if (indexLetter >=24){
-            indexLetter =25-indexLetter-1;
+        if (indexLetter >=(26-shiftEncryptionAmount)){
+            indexLetter =24-indexLetter;
+            return indexLetter;
         }
-        return indexLetter+2;
+        return indexLetter+shiftEncryptionAmount;
+    }
+
+    String writeToFile(ArrayList<String> text){
+        String totalString="";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i=0;i<text.size();i++){
+            totalString = (stringBuilder.append(text.get(i)))+(stringBuilder.append(" ")).toString();
+        }
+
+        try (FileWriter fileWriter = new FileWriter("Text.txt")){
+            fileWriter.write(totalString);
+        } catch(IOException e) {
+            System.out.println("Error with file: " + e.getMessage());
+        }
+        return totalString;
     }
 }
 
