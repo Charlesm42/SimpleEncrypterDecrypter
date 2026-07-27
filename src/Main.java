@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,11 +12,47 @@ public class Main {
         Main main = new Main();
         main.populateArray();
         main.readFromFile();
-        main.encrypt();
+        main.shiftAmount();
+        main.choice();
+    }
+
+    void shiftAmount(){
+       while (true){
+           String input = JOptionPane.showInputDialog("Please enter the amount you want to shift the letters by: ");
+           try {
+               shiftEncryptionAmount = Integer.parseInt(input);
+               break;
+           }catch (NumberFormatException e){
+               JOptionPane.showMessageDialog(null,"Please enter a valid integer to use.");
+           }
+       }
+    }
+
+    void choice(){
+        String[] choice = {"Encrypt","Decrypt"};
+        String input = (String) JOptionPane.showInputDialog(
+                null,
+                "Please choose between encrypting or decrypting:",
+                "Choice",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                choice,
+                choice[0]
+        );
+
+        if (!input.isBlank()&&input.equals("Encrypt")){
+            encrypt(true);
+        } else if (!input.isBlank()&&input.equals("Decrypt")){
+            encrypt(false);
+        }
+    }
+
+    int indexUnderZ(int indexLetter){
+        return ((indexLetter - shiftEncryptionAmount) % 26 + 26) % 26;
     }
 
     void populateArray() {
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < 26; i++) {
             alphabet.add((char) ('a' + i));                                                                //Loops through the array of the alphabet and adds the letters to each
         }
     }
@@ -32,10 +69,9 @@ public class Main {
     }
 
 
-    void encrypt(){
+    void encrypt(boolean encrypt){
         ArrayList<String> encryptedText = new ArrayList<>();
         for (int i=0;i<text.size();i++){
-            //each increment of i add a finder for the array that allows for each different line to be distinguished
             String WholeWord = text.get(i);
             int indexLetter;
             String encryptedWord= "";
@@ -46,7 +82,9 @@ public class Main {
                     System.out.println("Special character at index: "+i);
                 } else {
                     indexLetter = alphabet.indexOf(Letter);
-                    Letter = alphabet.get(indexOverZ(indexLetter));
+                    if (encrypt){
+                        Letter = alphabet.get(indexOverZ(indexLetter));
+                    }else Letter = alphabet.get(indexUnderZ(indexLetter));
                 }
                 encryptedWord = String.valueOf(stringBuilder.append(Letter));
             }
@@ -54,22 +92,19 @@ public class Main {
         }
         System.out.println(encryptedText);
         System.out.println(writeToFile(encryptedText));
+        System.out.println("Shifted by "+shiftEncryptionAmount+" letters.");
     }
 
     int indexOverZ(int indexLetter){
-        if (indexLetter >=(26-shiftEncryptionAmount)){
-            indexLetter =24-indexLetter;
-            return indexLetter;
-        }
-        return indexLetter+shiftEncryptionAmount;
+        return (indexLetter + shiftEncryptionAmount) % 26;
     }
 
     String writeToFile(ArrayList<String> text){
-        String totalString="";
         StringBuilder stringBuilder = new StringBuilder();
         for (int i=0;i<text.size();i++){
-            totalString = (stringBuilder.append(text.get(i)))+(stringBuilder.append(" ")).toString();
+            stringBuilder.append(text.get(i)).append(" ");
         }
+        String totalString = stringBuilder.toString();
 
         try (FileWriter fileWriter = new FileWriter("Text.txt")){
             fileWriter.write(totalString);
