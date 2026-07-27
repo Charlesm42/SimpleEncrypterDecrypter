@@ -51,7 +51,6 @@ public class Main {
         return ((indexLetter - shiftEncryptionAmount) % 26 + 26) % 26;
     }
 
-
     void populateArray() {
         for (int i = 0; i < 26; i++) {
             alphabet.add((char) ('a' + i));                                                                //Loops through the array of the alphabet and adds the letters to each
